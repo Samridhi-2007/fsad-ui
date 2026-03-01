@@ -60,14 +60,21 @@ function TaskList() {
       {!error && tasks.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {tasks.map((task) => (
-            <div key={task.id} className="bg-white rounded-xl p-5 shadow-md border border-slate-100 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+            <div
+              key={task.id}
+              className="bg-white rounded-xl p-5 shadow-md border border-slate-100 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+            >
               <div className="flex gap-4 items-start">
-                <span className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-teal-100 text-teal-700 rounded-lg text-xl">✅</span>
+                <span className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-teal-100 text-teal-700 rounded-lg text-sm font-bold">
+                  TASK
+                </span>
                 <div>
-                  <h3 className="font-semibold text-slate-900">{task.title || "—"}</h3>
-                  <p className="text-sm text-slate-500">{task.description || task.deadline || "—"}</p>
+                  <h3 className="font-semibold text-slate-900">{task.title || "-"}</h3>
+                  <p className="text-sm text-slate-500">{task.description || task.deadline || "-"}</p>
                   {task.status && (
-                    <span className={`inline-block mt-2 px-2.5 py-0.5 text-xs font-semibold rounded-full ${getStatusClass(task.status)}`}>
+                    <span
+                      className={`inline-block mt-2 px-2.5 py-0.5 text-xs font-semibold rounded-full ${getStatusClass(task.status)}`}
+                    >
                       {task.status}
                     </span>
                   )}

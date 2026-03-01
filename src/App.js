@@ -10,6 +10,13 @@ import Internshiplist from "./pages/internships/Internshiplist";
 import TaskList from "./pages/tasks/TaskList";
 import FeedbackList from "./pages/feedback/FeedbackList";
 import Auth from "./pages/Auth";
+import AdminUsersMentors from "./pages/admin/AdminUsersMentors";
+import AdminInternshipOverview from "./pages/admin/AdminInternshipOverview";
+import UserInternships from "./pages/user/UserInternships";
+import UserMentors from "./pages/user/UserMentors";
+import MentorMentees from "./pages/mentor/MentorMentees";
+import MentorCommunity from "./pages/mentor/MentorCommunity";
+import Profile from "./pages/Profile";
 
 function App() {
   const location = useLocation();
@@ -21,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
+
           <Route
             path="/dashboard"
             element={
@@ -29,10 +37,71 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/admin/users-mentors"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminUsersMentors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/internships"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminInternshipOverview />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user/internships"
+            element={
+              <ProtectedRoute allowedRoles={["user", "student"]}>
+                <UserInternships />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/mentors"
+            element={
+              <ProtectedRoute allowedRoles={["user", "student"]}>
+                <UserMentors />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/mentor/mentees"
+            element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <MentorMentees />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mentor/community"
+            element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <MentorCommunity />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/users"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <UserList />
               </ProtectedRoute>
             }
@@ -40,7 +109,7 @@ function App() {
           <Route
             path="/users/add"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <AddUser />
               </ProtectedRoute>
             }
@@ -48,7 +117,7 @@ function App() {
           <Route
             path="/internships"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <Internshiplist />
               </ProtectedRoute>
             }

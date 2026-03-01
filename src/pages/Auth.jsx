@@ -1,24 +1,45 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_DISPLAY_URL, AUTH_LOGIN_PATH, AUTH_REGISTER_PATH } from "../config";
 
 function Auth() {
   const [mode, setMode] = useState("login");
   const [role, setRole] = useState("user");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const { login, signup } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from?.pathname || "/dashboard";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
-    if (mode === "login") login(email, role);
-    else signup(email, role);
-    navigate(from, { replace: true });
+
+    setLoading(true);
+    setError("");
+
+    try {
+      if (mode === "login") {
+        await login(email, password, role);
+      } else {
+        await signup({ name, email, password, role });
+      }
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Authentication failed. Check backend auth endpoints."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,6 +105,35 @@ function Auth() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+              <p>{error}</p>
+              <small className="block mt-1 opacity-80">
+                Backend: {API_DISPLAY_URL} | Login: {AUTH_LOGIN_PATH} | Register: {AUTH_REGISTER_PATH}
+              </small>
+            </div>
+          )}
+
+          {mode === "signup" && (
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-semibold text-slate-700 mb-1.5"
+              >
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                placeholder="Your full name"
+              />
+            </div>
+          )}
+
           <div>
             <label
               htmlFor="email"
@@ -121,15 +171,16 @@ function Auth() {
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="w-full inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors"
           >
-            {mode === "login" ? "Login" : "Sign up"}
+            {loading ? "Please wait..." : mode === "login" ? "Login" : "Sign up"}
           </button>
         </form>
 
         <p className="mt-6 text-xs text-slate-400 text-center">
-          This demo auth is frontend-only. Hook it up to your Spring Boot auth
-          API when ready.
+          Auth is now backend-driven. If it fails, verify your Spring Boot auth
+          endpoints and CORS configuration.
         </p>
         <p className="mt-2 text-center text-xs text-slate-400">
           <Link to="/" className="underline hover:text-slate-600">
