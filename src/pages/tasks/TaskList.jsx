@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { http } from "../../api/http";
 import { API_DISPLAY_URL } from "../../config";
+import { useAuth } from "../../context/AuthContext";
+import { getRoleApiPrefix } from "../../utils/role";
 
 function TaskList() {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     http
-      .get("/tasks")
+      .get(`${getRoleApiPrefix(user?.role)}/tasks`)
       .then((res) => {
         setTasks(Array.isArray(res.data) ? res.data : []);
         setError(null);
@@ -19,7 +22,7 @@ function TaskList() {
         setError(err.message || "Failed to load tasks");
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user?.role]);
 
   const getStatusClass = (status) => {
     const s = (status || "").toLowerCase();

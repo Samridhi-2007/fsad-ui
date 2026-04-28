@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { http } from "../../api/http";
 import { API_DISPLAY_URL } from "../../config";
+import { useAuth } from "../../context/AuthContext";
+import { getRoleApiPrefix } from "../../utils/role";
 
 function FeedbackList() {
+  const { user } = useAuth();
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     http
-      .get("/feedbacks")
+      .get(`${getRoleApiPrefix(user?.role)}/feedbacks`)
       .then((res) => {
         setFeedbacks(Array.isArray(res.data) ? res.data : []);
         setError(null);
@@ -19,7 +22,7 @@ function FeedbackList() {
         setError(err.message || "Failed to load feedback");
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user?.role]);
 
   if (loading) {
     return (
@@ -46,7 +49,7 @@ function FeedbackList() {
       {!error && feedbacks.length === 0 && (
         <div className="bg-white rounded-xl shadow-md border border-slate-100 p-12 text-center">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">No feedback yet</h3>
-          <p className="text-slate-600">Feedback from mentors will appear here.</p>
+          <p className="text-slate-600">Feedback from recruiters or platform reviewers will appear here.</p>
         </div>
       )}
 

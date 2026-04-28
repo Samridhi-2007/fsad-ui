@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { http } from "../../api/http";
 import { API_DISPLAY_URL } from "../../config";
+import { mergeInternshipsWithRecruiterOpenings } from "../../services/recruiterOpeningsService";
 
 function parseDate(item) {
   const candidates = [item?.endDate, item?.deadline, item?.lastDate, item?.expiresAt];
@@ -29,13 +30,14 @@ function AdminInternshipOverview() {
 
   useEffect(() => {
     http
-      .get("/internships")
+      .get("/admin/internships")
       .then((res) => {
-        setInternships(Array.isArray(res.data) ? res.data : []);
+        const apiInternships = Array.isArray(res.data) ? res.data : [];
+        setInternships(mergeInternshipsWithRecruiterOpenings(apiInternships));
         setError("");
       })
       .catch((err) => {
-        setInternships([]);
+        setInternships(mergeInternshipsWithRecruiterOpenings([]));
         setError(err.response?.data?.message || err.message || "Failed to load internships");
       })
       .finally(() => setLoading(false));

@@ -19,8 +19,8 @@ function getUserFromResponse(data) {
   return candidate;
 }
 
-export async function loginUser({ email, password, role }) {
-  const payload = { email, password, role };
+export async function loginUser({ email, password }) {
+  const payload = { email, password };
   const response = await http.post(AUTH_LOGIN_PATH, payload);
   const data = response?.data;
   const userData = getUserFromResponse(data);
@@ -29,11 +29,24 @@ export async function loginUser({ email, password, role }) {
   const user = {
     ...userData,
     email: userData.email || email,
-    role: normalizeRole(userData.role || role),
+    role: normalizeRole(userData.role),
     name: userData.name || email.split("@")[0] || "User",
   };
 
   return { user, token };
+}
+
+export async function getCurrentUser() {
+  const response = await http.get("/auth/me");
+  const data = response?.data;
+  const userData = getUserFromResponse(data);
+
+  return {
+    ...userData,
+    email: userData.email || "",
+    role: normalizeRole(userData.role),
+    name: userData.name || userData.email?.split("@")[0] || "User",
+  };
 }
 
 export async function registerUser({ name, email, password, role }) {
@@ -46,7 +59,7 @@ export async function registerUser({ name, email, password, role }) {
   const user = {
     ...userData,
     email: userData.email || email,
-    role: normalizeRole(userData.role || role),
+    role: normalizeRole(userData.role || role || "intern"),
     name: userData.name || name || email.split("@")[0] || "User",
   };
 

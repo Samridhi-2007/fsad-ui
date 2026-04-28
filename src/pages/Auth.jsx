@@ -5,7 +5,6 @@ import { API_DISPLAY_URL, AUTH_LOGIN_PATH, AUTH_REGISTER_PATH } from "../config"
 
 function Auth() {
   const [mode, setMode] = useState("login");
-  const [role, setRole] = useState("user");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,9 +25,9 @@ function Auth() {
 
     try {
       if (mode === "login") {
-        await login(email, password, role);
+        await login(email, password);
       } else {
-        await signup({ name, email, password, role });
+        await signup({ name, email, password, role: "intern" });
       }
       navigate(from, { replace: true });
     } catch (err) {
@@ -51,33 +50,6 @@ function Auth() {
         <p className="text-sm text-slate-500 mb-6 text-center">
           Sign in to access your InternSync dashboard.
         </p>
-
-        {/* Role selector */}
-        <div className="mb-5">
-          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">
-            Login as
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: "admin", label: "Admin" },
-              { id: "mentor", label: "Mentor" },
-              { id: "user", label: "User" },
-            ].map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setRole(id)}
-                className={`py-1.5 text-xs font-semibold rounded-full border transition-colors ${
-                  role === id
-                    ? "bg-teal-600 text-white border-teal-600"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-teal-500 hover:text-teal-700"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
 
         <div className="flex mb-6 rounded-lg bg-slate-100 p-1">
           <button
@@ -179,8 +151,7 @@ function Auth() {
         </form>
 
         <p className="mt-6 text-xs text-slate-400 text-center">
-          Auth is now backend-driven. If it fails, verify your Spring Boot auth
-          endpoints and CORS configuration.
+          Login is backend role-driven. New sign-ups create intern accounts by default.
         </p>
         <p className="mt-2 text-center text-xs text-slate-400">
           <Link to="/" className="underline hover:text-slate-600">

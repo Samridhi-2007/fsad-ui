@@ -9,15 +9,15 @@ function Dashboard() {
   const role = normalizeRole(user?.role);
   const userApplications = getApplicationsByUser(user?.email);
 
-  if (role === "user") {
+  if (role === "intern") {
     return <UserDashboard />;
   }
 
   const adminCards = [
     {
       to: "/admin/users-mentors",
-      title: "Users and Mentors",
-      desc: "View all users and mentors with their details.",
+      title: "Users and Recruiters",
+      desc: "View all users and recruiters with their details.",
     },
     {
       to: "/admin/internships",
@@ -31,25 +31,25 @@ function Dashboard() {
     },
   ];
 
-  const mentorCards = [
+  const recruiterCards = [
     {
-      to: "/mentor/mentees",
-      title: "My Mentees",
-      desc: "View users and follow their progress.",
+      to: "/recruiter/openings",
+      title: "Post Openings",
+      desc: "Create internship openings that users can browse and apply for.",
     },
     {
-      to: "/mentor/community",
-      title: "Mentor Community",
-      desc: "Join communities and collaborate with mentors.",
+      to: "/recruiter/applicants",
+      title: "View Applicants",
+      desc: "Review candidates who applied to your posted openings.",
     },
     {
       to: "/profile",
-      title: "Mentor Profile",
+      title: "Recruiter Profile",
       desc: "View your profile and account details.",
     },
   ];
 
-  const cards = role === "admin" ? adminCards : mentorCards;
+  const cards = role === "admin" ? adminCards : recruiterCards;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -73,7 +73,7 @@ function Dashboard() {
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500">User Applications</p>
             <p className="mt-1 text-sm font-semibold text-slate-900">
-              {role === "user" ? userApplications.length : "N/A"}
+              {role === "intern" ? userApplications.length : "N/A"}
             </p>
           </div>
         </div>

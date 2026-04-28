@@ -1,21 +1,22 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser } from "../services/authServices";
+import { getCurrentUser, loginUser, registerUser } from "../services/authServices";
 
 const AuthContext = createContext(null);
 const STORAGE_USER_KEY = "internsync_user";
 const STORAGE_TOKEN_KEY = "internsync_token";
 
 export function AuthProvider({ children }) {
+  const storedUser = localStorage.getItem(STORAGE_USER_KEY);
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem(STORAGE_USER_KEY);
-    if (!stored) return null;
+    if (!storedUser) return null;
 
     try {
-      return JSON.parse(stored);
+      return JSON.parse(storedUser);
     } catch {
       return null;
     }
   });
+  const [authReady, setAuthReady] = useState(() => !storedUser);
 
   useEffect(() => {
     if (!user) {
@@ -24,8 +25,41 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const login = async (email, password, role = "user") => {
-    const { user: loggedInUser, token } = await loginUser({ email, password, role });
+  useEffect(() => {
+    const hasStoredUser = !!localStorage.getItem(STORAGE_USER_KEY);
+    if (!hasStoredUser) {
+      setAuthReady(true);
+      return;
+    }
+
+    let cancelled = false;
+
+    getCurrentUser()
+      .then((currentUser) => {
+        if (cancelled) return;
+        setUser(currentUser);
+        localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(currentUser));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUser(null);
+        localStorage.removeItem(STORAGE_USER_KEY);
+        localStorage.removeItem(STORAGE_TOKEN_KEY);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setAuthReady(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const login = async (email, password) => {
+    localStorage.removeItem(STORAGE_TOKEN_KEY);
+    const { user: loggedInUser, token } = await loginUser({ email, password });
     const u = { ...loggedInUser };
     setUser(u);
     localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(u));
@@ -58,6 +92,7 @@ export function AuthProvider({ children }) {
   };
 
   const value = {
+    authReady,
     user,
     isAuthenticated: !!user,
     login,

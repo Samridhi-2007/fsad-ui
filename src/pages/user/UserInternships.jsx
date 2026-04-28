@@ -1,34 +1,32 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { http } from "../../api/http";
 import { API_DISPLAY_URL } from "../../config";
 import { useAuth } from "../../context/AuthContext";
-import { applyToInternship, hasApplied } from "../../services/applicationServices";
+import { hasApplied } from "../../services/applicationServices";
+import { mergeInternshipsWithRecruiterOpenings } from "../../services/recruiterOpeningsService";
+import { getRoleApiPrefix } from "../../utils/role";
 
 function UserInternships() {
   const { user } = useAuth();
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [, setRefreshKey] = useState(0);
 
   useEffect(() => {
     http
-      .get("/internships")
+      .get(`${getRoleApiPrefix(user?.role)}/internships`)
       .then((res) => {
-        setInternships(Array.isArray(res.data) ? res.data : []);
+        const apiInternships = Array.isArray(res.data) ? res.data : [];
+        setInternships(mergeInternshipsWithRecruiterOpenings(apiInternships));
         setError("");
       })
       .catch((err) => {
-        setInternships([]);
+        setInternships(mergeInternshipsWithRecruiterOpenings([]));
         setError(err.response?.data?.message || err.message || "Failed to load internships");
       })
       .finally(() => setLoading(false));
-  }, []);
-
-  const handleApply = (internship) => {
-    applyToInternship({ userEmail: user?.email, internship });
-    setRefreshKey((prev) => prev + 1);
-  };
+  }, [user?.role]);
 
   if (loading) return <div className="text-slate-600">Loading internships...</div>;
 
@@ -60,18 +58,20 @@ function UserInternships() {
                 <p className="text-sm text-slate-500 mt-3">
                   {item.description || item.duration || "No additional details"}
                 </p>
-                <button
-                  type="button"
-                  disabled={applied}
-                  onClick={() => handleApply(item)}
-                  className={`mt-4 w-full px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                <Link
+                  to={`/user/internships/${item.id}/apply`}
+                  state={{ internship: item }}
+                  className={`mt-4 inline-flex w-full justify-center px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
                     applied
                       ? "bg-slate-200 text-slate-500 cursor-not-allowed"
                       : "bg-teal-600 text-white hover:bg-teal-700"
                   }`}
+                  onClick={(event) => {
+                    if (applied) event.preventDefault();
+                  }}
                 >
                   {applied ? "Applied" : "Apply"}
-                </button>
+                </Link>
               </article>
             );
           })}

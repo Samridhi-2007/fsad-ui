@@ -13,18 +13,22 @@ import Auth from "./pages/Auth";
 import AdminUsersMentors from "./pages/admin/AdminUsersMentors";
 import AdminInternshipOverview from "./pages/admin/AdminInternshipOverview";
 import UserInternships from "./pages/user/UserInternships";
+import UserInternshipApply from "./pages/user/UserInternshipApply";
+import UserCompetitions from "./pages/user/UserCompetitions";
+import UserCompetitionDetails from "./pages/user/UserCompetitionDetails";
 import UserMentors from "./pages/user/UserMentors";
-import MentorMentees from "./pages/mentor/MentorMentees";
-import MentorCommunity from "./pages/mentor/MentorCommunity";
+import RecruiterOpenings from "./pages/recruiter/RecruiterOpenings";
+import RecruiterApplicants from "./pages/recruiter/RecruiterApplicants";
 import Profile from "./pages/Profile";
 
 function App() {
   const location = useLocation();
+  const isLandingPage = location.pathname === "/";
 
   return (
     <>
-      {location.pathname === "/" ? <LandingNav /> : <Navbar />}
-      <main className="min-h-[calc(100vh-64px)] p-6 md:p-8 bg-slate-50">
+      {isLandingPage ? <LandingNav /> : <Navbar />}
+      <main className={isLandingPage ? "min-h-screen bg-transparent" : "min-h-[calc(100vh-64px)] p-6 md:p-8 bg-slate-50"}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
@@ -58,33 +62,57 @@ function App() {
           <Route
             path="/user/internships"
             element={
-              <ProtectedRoute allowedRoles={["user", "student"]}>
+              <ProtectedRoute allowedRoles={["intern", "student"]}>
                 <UserInternships />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/internships/:internshipId/apply"
+            element={
+              <ProtectedRoute allowedRoles={["intern", "student"]}>
+                <UserInternshipApply />
               </ProtectedRoute>
             }
           />
           <Route
             path="/user/mentors"
             element={
-              <ProtectedRoute allowedRoles={["user", "student"]}>
+              <ProtectedRoute allowedRoles={["intern", "student"]}>
                 <UserMentors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/competitions"
+            element={
+              <ProtectedRoute allowedRoles={["intern", "student"]}>
+                <UserCompetitions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/competitions/:competitionId"
+            element={
+              <ProtectedRoute allowedRoles={["intern", "student"]}>
+                <UserCompetitionDetails />
               </ProtectedRoute>
             }
           />
 
           <Route
-            path="/mentor/mentees"
+            path="/recruiter/openings"
             element={
-              <ProtectedRoute allowedRoles={["mentor"]}>
-                <MentorMentees />
+              <ProtectedRoute allowedRoles={["recruiter"]}>
+                <RecruiterOpenings />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/mentor/community"
+            path="/recruiter/applicants"
             element={
-              <ProtectedRoute allowedRoles={["mentor"]}>
-                <MentorCommunity />
+              <ProtectedRoute allowedRoles={["recruiter"]}>
+                <RecruiterApplicants />
               </ProtectedRoute>
             }
           />
@@ -125,7 +153,7 @@ function App() {
           <Route
             path="/tasks"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <TaskList />
               </ProtectedRoute>
             }
@@ -133,7 +161,7 @@ function App() {
           <Route
             path="/feedback"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <FeedbackList />
               </ProtectedRoute>
             }

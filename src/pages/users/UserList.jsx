@@ -10,7 +10,7 @@ function UserList() {
 
   useEffect(() => {
     http
-      .get("/users")
+      .get("/admin/users")
       .then((res) => {
         setUsers(Array.isArray(res.data) ? res.data : []);
         setError(null);

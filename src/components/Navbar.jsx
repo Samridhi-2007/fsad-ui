@@ -19,16 +19,15 @@ function Navbar() {
   const userLinks = [
     { to: "/dashboard", label: "Dashboard" },
     { to: "/user/internships", label: "Internships" },
-    { to: "/user/mentors", label: "Mentors" },
-    { to: "/tasks", label: "Tasks" },
+    { to: "/user/mentors", label: "Recruiters" },
+    { to: "/user/competitions", label: "Competitions" },
     { to: "/profile", label: "Profile" },
   ];
 
-  const mentorLinks = [
+  const recruiterLinks = [
     { to: "/dashboard", label: "Dashboard" },
-    { to: "/mentor/mentees", label: "Mentees" },
-    { to: "/mentor/community", label: "Community" },
-    { to: "/feedback", label: "Feedback" },
+    { to: "/recruiter/openings", label: "Openings" },
+    { to: "/recruiter/applicants", label: "Applicants" },
     { to: "/profile", label: "Profile" },
   ];
 
@@ -37,7 +36,7 @@ function Navbar() {
   ];
 
   const navLinks =
-    !isAuthenticated ? guestLinks : role === "admin" ? adminLinks : role === "mentor" ? mentorLinks : userLinks;
+    !isAuthenticated ? guestLinks : role === "admin" ? adminLinks : role === "recruiter" ? recruiterLinks : userLinks;
 
   return (
     <nav className="flex flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-3 md:h-16 bg-gradient-to-r from-teal-700 to-teal-600 shadow-lg">
